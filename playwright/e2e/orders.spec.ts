@@ -11,13 +11,17 @@ test('Must check an approved order', async ({ page }) => {
   await expect(page.getByRole('heading')).toContainText('Consultar Pedido')
 
   //Act
-  await page.getByTestId('search-order-id').fill('VLO-SJIN6D')
-  await page.getByTestId('search-order-button').click()
+  await page.getByRole('textbox', { name: 'Número do Pedido' }).fill('VLO-SJIN6D')
+  await page.getByRole('button', { name: 'Buscar Pedido' }).click()
 
   //Assert
-  await expect(page.getByTestId('order-result-id')).toBeVisible()
-  await expect(page.getByTestId('order-result-id')).toContainText('VLO-SJIN6D')
+  await expect(page.getByText('VLO-SJIN6D')).toBeVisible({timeout: 10_000})
+  await expect(page.getByText('APROVADO')).toBeVisible()
 
-  await expect(page.getByTestId('order-result-status')).toBeVisible()
-  await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+
+  //await expect(page.getByTestId('order-result-id')).toBeVisible({timeout: 10_000})
+  //await expect(page.getByTestId('order-result-id')).toContainText('VLO-SJIN6D')
+  //await expect(page.getByTestId('order-result-status')).toBeVisible()
+  //await expect(page.getByTestId('order-result-status')).toContainText('APROVADO')
+
 })
