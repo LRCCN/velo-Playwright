@@ -1,43 +1,57 @@
-import { Page, Locator, expect } from "@playwright/test"
+import { Page, expect } from '@playwright/test'
 
 type OrderStatus = 'APROVADO' | 'REPROVADO' | 'EM_ANALISE'
 
-const STATUS_CONFIG = {
-  APROVADO:  { color: 'green',  icon: 'lucide-circle-check-big' },
-  REPROVADO: { color: 'red',    icon: 'lucide-circle-x'         },
-  EM_ANALISE:{ color: 'amber',  icon: 'lucide-clock'            },
-} satisfies Record<OrderStatus, { color: string; icon: string }>
+type StatusClasses = {
+    background: string
+    text: string
+    icon: string
+}
+
+const STATUS_CLASSES: Record<OrderStatus, StatusClasses> = {
+    APROVADO: {
+        background: 'bg-green-100',
+        text: 'text-green-700',
+        icon: 'lucide-circle-check-big'
+    },
+    REPROVADO: {
+        background: 'bg-red-100',
+        text: 'text-red-700',
+        icon: 'lucide-circle-x'
+    },
+    EM_ANALISE: {
+        background: 'bg-amber-100',
+        text: 'text-amber-700',
+        icon: 'lucide-clock'
+    }
+}
 
 export class OrderLockupPage {
-  constructor(private page: Page) {}
+    constructor(private page: Page) { }
 
-  async searchOrder(code: string) {
-    await this.page.getByRole('textbox', { name: 'Número do Pedido' }).fill(code)
-    await this.page.getByRole('button', { name: 'Buscar Pedido' }).click()
-  }
+    async searchOrder(code: string) {
+        await this.page.getByRole('textbox', { name: 'Número do Pedido' }).fill(code)
+        await this.page.getByRole('button', { name: 'Buscar Pedido' }).click()
+    }
 
-  getStatusBadge(status: OrderStatus): Locator {
-    return this.page.getByRole('status').filter({ hasText: status })
-  }
+    async validateStatusBadge(status: OrderStatus) {
+        const { background, text, icon } = STATUS_CLASSES[status]
+        const statusBadge = this.page.getByRole('status').filter({ hasText: status })
 
-  async expectStatusBadge(status: OrderStatus): Promise<void> {
-    const { color, icon } = STATUS_CONFIG[status]
-    const badge = this.getStatusBadge(status)
+        await expect(statusBadge).toHaveClass(new RegExp(background))
+        await expect(statusBadge).toHaveClass(new RegExp(text))
+        await expect(statusBadge.locator('svg')).toHaveClass(new RegExp(icon))
+    }
 
-    await expect(badge).toHaveClass(new RegExp(`bg-${color}-100`))
-    await expect(badge).toHaveClass(new RegExp(`text-${color}-700`))
-    await expect(badge.locator('svg')).toHaveClass(new RegExp(icon))
-  }
+    async expectApprovedBadge() {
+        await this.validateStatusBadge('APROVADO')
+    }
 
-  async expectApprovedBadge(): Promise<void> {
-    await this.expectStatusBadge('APROVADO')
-  }
+    async expectFailedBadge() {
+        await this.validateStatusBadge('REPROVADO')
+    }
 
-  async expectFailedBadge(): Promise<void> {
-    await this.expectStatusBadge('REPROVADO')
-  }
-
-  async expectInAnalysisBadge(): Promise<void> {
-    await this.expectStatusBadge('EM_ANALISE')
-  }
+    async expectInAnalysisBadge() {
+        await this.validateStatusBadge('EM_ANALISE')
+    }
 }
