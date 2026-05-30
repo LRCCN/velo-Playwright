@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Package, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Search, Package, CheckCircle, XCircle, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,6 +35,35 @@ const colorLabels: Record<ExteriorColor, string> = {
   'lunar-white': 'Lunar White',
   'midnight-black': 'Midnight Black',
 };
+
+const statusBadgeConfig = {
+  APROVADO: {
+    className: 'bg-green-100 text-green-700',
+    Icon: CheckCircle,
+  },
+  REPROVADO: {
+    className: 'bg-red-100 text-red-700',
+    Icon: XCircle,
+  },
+  EM_ANALISE: {
+    className: 'bg-amber-100 text-amber-700',
+    Icon: Clock,
+  },
+} as const;
+
+function OrderStatusBadge({ status }: { status: Order['status'] }) {
+  const { className, Icon } = statusBadgeConfig[status];
+
+  return (
+    <div
+      role="status"
+      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${className}`}
+    >
+      <Icon className="w-4 h-4" />
+      {status}
+    </div>
+  );
+}
 
 const OrderLookup = () => {
   const [orderId, setOrderId] = useState('');
@@ -143,20 +172,7 @@ const OrderLookup = () => {
                     </p>
                   </div>
                 </div>
-                <div
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
-                    searchedOrder.status === 'APROVADO'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}
-                >
-                  {searchedOrder.status === 'APROVADO' ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : (
-                    <XCircle className="w-4 h-4" />
-                  )}
-                  {searchedOrder.status}
-                </div>
+                <OrderStatusBadge status={searchedOrder.status} />
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
