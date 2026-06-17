@@ -37,7 +37,7 @@ test.describe('Checkout', () => {
       const customer = {
         name: 'A',
         lastname: 'B',
-        email: 'papito@teste.com',
+        email: 'luiz@teste.com',
         document: '00000014141',
         phone: '(11) 99999-9999'
       }
@@ -57,9 +57,9 @@ test.describe('Checkout', () => {
 
     test('deve exibir erro para e-mail com formato inválido', async ({ app }) => {
       const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@',
         document: '00000014141',
         phone: '(11) 99999-9999'
       }
@@ -79,9 +79,9 @@ test.describe('Checkout', () => {
     test('deve exibir erro para CPF inválido', async ({ app }) => {
 
       const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@test.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@test.com',
         document: '00000014199',
         phone: '(11) 99999-9999'
       }
@@ -101,9 +101,9 @@ test.describe('Checkout', () => {
     test('deve exigir o aceite dos termos ao finalizar com dados válidos', async ({ app }) => {
 
       const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@test.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@test.com',
         document: '00000014199',
         phone: '(11) 99999-9999'
       }
@@ -131,9 +131,9 @@ test.describe('Checkout', () => {
     test('deve criar um pedido com sucesso para pagamento à vista', async ({ app }) => {
 
       const customer = {
-        name: 'Fernando',
-        lastname: 'Papito',
-        email: 'papito@teste.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@teste.com',
         document: '05366127068',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -164,9 +164,9 @@ test.describe('Checkout', () => {
     test('deve aprovar automaticamente o crédito quando o score do CPF for maior que 700 no financiamento', async ({ app }) => {
 
       const customer = {
-        name: 'Steve',
-        lastname: 'Woz',
-        email: 'woz@velo.dev',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@velo.dev',
         document: '65493881047',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -199,9 +199,9 @@ test.describe('Checkout', () => {
     test('deve encaminhar para análise de crédito quando o score do CPF for entre 501 e 700 no financiamento', async ({ app }) => {
 
       const customer = {
-        name: 'Tony',
-        lastname: 'Stark',
-        email: 'tony@stark.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@stark.com',
         document: '74690251037',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -233,9 +233,9 @@ test.describe('Checkout', () => {
     test('deve reprovar o crédito quando o score do CPF for menor ou igual a 500 no financiamento sem entrada', async ({ app }) => {
 
       const customer = {
-        name: 'Clark',
-        lastname: 'Kent',
-        email: 'clark@dailyplanet.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@dailyplanet.com',
         document: '52998224725',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -267,9 +267,9 @@ test.describe('Checkout', () => {
     test('deve reprovar o crédito quando o score do CPF for menor ou igual a 500 no financiamento com entrada menor que 50%', async ({ app }) => {
 
       const customer = {
-        name: 'Diana',
-        lastname: 'Prince',
-        email: 'diana@themiscira.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@themiscira.com',
         document: '11144477735',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -303,9 +303,9 @@ test.describe('Checkout', () => {
     test('deve reprovar o crédito quando o score do CPF for menor ou igual a 500 no financiamento com entrada igual a 50%', async ({ app }) => {
 
       const customer = {
-        name: 'Richard',
-        lastname: 'Fortus',
-        email: 'richard@gmail.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@gmail.com',
         document: '39434745004',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
@@ -339,9 +339,9 @@ test.describe('Checkout', () => {
     test('deve aprovar o crédito quando o score do CPF for menor ou igual a 500 no financiamento com entrada mair que 50%', async ({ app }) => {
 
       const customer = {
-        name: 'Axl',
-        lastname: 'Rose',
-        email: 'alx@gnr.com',
+        name: 'Luiz',
+        lastname: 'Neto',
+        email: 'luiz@gnr.com',
         document: '79327557000',
         phone: '(11) 99999-9999',
         store: 'Velô Paulista',
