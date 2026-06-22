@@ -14,7 +14,9 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_SCOPE: fernandopapito-4832s-projects
+  VITE_SUPABASE_PROJECT_ID: kwtzwqhnnybnkpqhughu
+  VITE_SUPABASE_URL: https://kwtzwqhnnybnkpqhughu.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_RThrY0JW7uTdBJioguKWhg_HiK9fjj4
 
 jobs:
   unit-tests:
@@ -75,8 +77,7 @@ jobs:
         run: |
           yarn vercel pull --yes \
           --environment=preview \
-          --token=$VERCEL_TOKEN \
-          --scope=$VERCEL_SCOPE
+          --token=$VERCEL_TOKEN
       
       # 6. Build para o Vercel
       - name: Build Vercel
@@ -88,8 +89,7 @@ jobs:
         run: |
           URL=$(yarn --silent vercel deploy --prebuilt \
           --target=preview \
-          --token=$VERCEL_TOKEN \
-          --scope=$VERCEL_SCOPE)
+          --token=$VERCEL_TOKEN)
           echo "deployment-url=$URL" >> $GITHUB_OUTPUT
 
   e2e-tests:
@@ -149,5 +149,4 @@ jobs:
         run: |
           npx vercel@latest promote ${{ needs.build-and-deploy.outputs.deployment-url }} \
           --token=$VERCEL_TOKEN \
-          --scope=$VERCEL_SCOPE \
           --yes
