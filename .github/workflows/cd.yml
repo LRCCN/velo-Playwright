@@ -117,9 +117,27 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
+      - name: Debug Playwright install context
+        run: |
+          #region agent log
+          node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={node:process.version,yarn:sh('yarn --version'),playwright:sh('yarn playwright --version'),home:process.env.HOME,playwrightBrowsersPath:process.env.PLAYWRIGHT_BROWSERS_PATH||'default',pwd:process.cwd()};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H2,H3,H5',location:'.github/workflows/cd.yml:debug-context',message:'before playwright install context',data,timestamp:Date.now()})+'\n');"
+          #endregion
+          cat debug-41ae37.log
+
       # 5. Instalação do Chromium
       - name: Install Plawright Browser
-        run: yarn playwright install --with-deps chromium
+        run: |
+          #region agent log
+          node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={disk:sh('df -h .'),cacheDir:sh('bash -lc \"ls -la ~/.cache 2>/dev/null || true\"')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H2,H3,H4',location:'.github/workflows/cd.yml:install-start',message:'starting playwright chromium install',data,timestamp:Date.now()})+'\n');"
+          #endregion
+          DEBUG=pw:install yarn playwright install --with-deps chromium
+          INSTALL_STATUS=$?
+          export INSTALL_STATUS
+          #region agent log
+          node -e "const fs=require('fs');const status=process.env.INSTALL_STATUS;fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H4',location:'.github/workflows/cd.yml:install-end',message:'playwright chromium install finished',data:{status},timestamp:Date.now()})+'\n');"
+          #endregion
+          cat debug-41ae37.log
+          exit $INSTALL_STATUS
 
       # 6. Execução dos Testes de Regressão
       - name: Run E2E Regression Tests
@@ -134,6 +152,13 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+
+      - name: Upload CI debug log
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ci-debug-log
+          path: debug-41ae37.log
       
       # 8. Publicar report JSON do TestDino
       - name: Publish Testdino Report
