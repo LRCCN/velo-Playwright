@@ -116,33 +116,17 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      # 5. Cache do browser do Playwright
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      # 6. Instalação do Chromium (pulado se cache existir)
+      # 5. Instala o Chromium do Playwright de forma consistente
       - name: Install Playwright Browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install --with-deps chromium
 
-      # 6.1 Instala apenas as dependências do sistema se o cache foi restaurado
-      - name: Install system dependencies only
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: yarn playwright install-deps chromium
-
-      # 7. Execução dos Testes de Regressão
+      # 6. Execução dos Testes de Regressão
       - name: Run E2E Regression Tests
         run: yarn playwright test
         env:
           BASE_URL: ${{ needs.build-and-deploy.outputs.deployment-url }}
 
-      # 8. Relatório de Testes Automatizados
+      # 7. Relatório de Testes Automatizados
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7.0.1
@@ -150,7 +134,7 @@ jobs:
           name: playwright-report
           path: playwright-report
       
-      # 9. Publicar report JSON do TestDino
+      # 8. Publicar report JSON do TestDino
       - name: Publish Testdino Report
         if: ${{ !cancelled() }}
         run: npx tdpw upload ./playwright-report --token=${{ secrets.TD_TOKEN }}
