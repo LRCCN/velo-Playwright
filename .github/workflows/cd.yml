@@ -97,6 +97,8 @@ jobs:
     name: Run E2E Tests
     needs: [build-and-deploy]
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.57.0-noble
 
     steps:
       # 1. Faz checkout do código do repositório
@@ -117,52 +119,33 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Debug Playwright install context
+      - name: Debug Playwright runtime context
         run: |
           #region agent log
-          node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={node:process.version,yarn:sh('yarn --version'),playwright:sh('yarn playwright --version'),home:process.env.HOME,playwrightBrowsersPath:process.env.PLAYWRIGHT_BROWSERS_PATH||'default',pwd:process.cwd()};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H2,H3,H5',location:'.github/workflows/cd.yml:debug-context',message:'before playwright install context',data,timestamp:Date.now()})+'\n');"
+          node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={node:process.version,yarn:sh('yarn --version'),playwright:sh('yarn playwright --version'),home:process.env.HOME,playwrightBrowsersPath:process.env.PLAYWRIGHT_BROWSERS_PATH||'default',pwd:process.cwd(),msPlaywright:sh('bash -lc \"ls -la /ms-playwright 2>/dev/null || true\"'),cachePlaywright:sh('bash -lc \"ls -la ~/.cache/ms-playwright 2>/dev/null || true\"')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-container',hypothesisId:'FIX-H1',location:'.github/workflows/cd.yml:debug-runtime-context',message:'playwright container runtime context',data,timestamp:Date.now()})+'\n');"
           #endregion
           cat debug-41ae37.log
 
-      # 5. Instalação do Chromium
-      - name: Install Plawright Browser
+      # 5. Execução dos Testes de Regressão
+      - name: Run E2E Regression Tests
         run: |
           #region agent log
-          node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={disk:sh('df -h .'),cacheDir:sh('bash -lc \"ls -la ~/.cache 2>/dev/null || true\"')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H2,H3,H4',location:'.github/workflows/cd.yml:install-start',message:'starting playwright chromium install',data,timestamp:Date.now()})+'\n');"
+          node -e "const fs=require('fs');fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-container',hypothesisId:'FIX-H1',location:'.github/workflows/cd.yml:e2e-start',message:'starting e2e tests without browser install step',data:{baseUrl:process.env.BASE_URL},timestamp:Date.now()})+'\n');"
           #endregion
           set +e
-          DEBUG=pw:install yarn playwright install --with-deps chromium &
-          INSTALL_PID=$!
-          export INSTALL_PID
-          (
-            while kill -0 "$INSTALL_PID" 2>/dev/null; do
-              #region agent log
-              node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>{try{return cp.execSync(c,{stdio:['ignore','pipe','ignore'],shell:'/bin/bash'}).toString().trim()}catch(e){return 'ERR:'+e.status}};const pid=process.env.INSTALL_PID;const data={installPid:pid,installProcess:sh('ps -o pid,ppid,stat,etime,cmd -p '+pid),relatedProcesses:sh('pgrep -af \"playwright|node|unzip|zip|chromium\" || true'),tmpDownloads:sh('du -sh /tmp/playwright-download-* 2>/dev/null || true'),browserCache:sh('du -sh ~/.cache/ms-playwright 2>/dev/null || true'),disk:sh('df -h .')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H3,H4',location:'.github/workflows/cd.yml:install-heartbeat',message:'playwright install still running',data,timestamp:Date.now()})+'\n');"
-              #endregion
-              cat debug-41ae37.log | tail -n 1
-              sleep 30
-            done
-          ) &
-          MONITOR_PID=$!
-          wait "$INSTALL_PID"
-          INSTALL_STATUS=$?
-          export INSTALL_STATUS
-          kill "$MONITOR_PID" 2>/dev/null || true
-          wait "$MONITOR_PID" 2>/dev/null || true
+          yarn playwright test
+          TEST_STATUS=$?
+          export TEST_STATUS
           set -e
           #region agent log
-          node -e "const fs=require('fs');const status=process.env.INSTALL_STATUS;fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H4',location:'.github/workflows/cd.yml:install-end',message:'playwright chromium install finished',data:{status},timestamp:Date.now()})+'\n');"
+          node -e "const fs=require('fs');fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-container',hypothesisId:'FIX-H1',location:'.github/workflows/cd.yml:e2e-end',message:'e2e tests finished',data:{status:process.env.TEST_STATUS},timestamp:Date.now()})+'\n');"
           #endregion
           cat debug-41ae37.log
-          exit $INSTALL_STATUS
-
-      # 6. Execução dos Testes de Regressão
-      - name: Run E2E Regression Tests
-        run: yarn playwright test
+          exit $TEST_STATUS
         env:
           BASE_URL: ${{ needs.build-and-deploy.outputs.deployment-url }}
 
-      # 7. Relatório de Testes Automatizados
+      # 6. Relatório de Testes Automatizados
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7.0.1
@@ -177,7 +160,7 @@ jobs:
           name: ci-debug-log
           path: debug-41ae37.log
       
-      # 8. Publicar report JSON do TestDino
+      # 7. Publicar report JSON do TestDino
       - name: Publish Testdino Report
         if: ${{ !cancelled() }}
         run: npx tdpw upload ./playwright-report --token=${{ secrets.TD_TOKEN }}
