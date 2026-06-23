@@ -84,6 +84,14 @@ jobs:
           --token=$VERCEL_TOKEN \
           --scope=$VERCEL_SCOPE
 
+      # Confirma qual Supabase está nas variáveis baixadas para o build de preview.
+      - name: Verify Supabase environment (Preview)
+        run: |
+          SUPABASE_URL=$(grep VITE_SUPABASE_URL .vercel/.env.preview.local | cut -d= -f2 | tr -d '"')
+          SUPABASE_PROJECT=$(grep VITE_SUPABASE_PROJECT_ID .vercel/.env.preview.local | cut -d= -f2 | tr -d '"')
+          echo "Supabase Project : $SUPABASE_PROJECT"
+          echo "Supabase URL     : $SUPABASE_URL"
+
       # Build embute as variáveis VITE_SUPABASE_* de preview no bundle.
       - name: Build (Preview)
         run: yarn vercel build --token=$VERCEL_TOKEN
@@ -121,6 +129,14 @@ jobs:
 
       - name: Install Playwright Browser
         run: yarn playwright install --with-deps chromium
+
+      # Confirma URL de preview e qual banco será usado pelos testes.
+      - name: Verify E2E targets
+        run: |
+          echo "App under test   : ${{ needs.build-preview.outputs.deployment-url }}"
+          echo "Database (preview): $(echo $DATABASE_URL | sed 's|postgresql://[^@]*@||' | cut -d/ -f1)"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PREVIEW }}
 
       # BASE_URL aponta para o deploy de preview (Supabase de preview).
       # DATABASE_URL_PREVIEW é a connection string do Supabase de preview,
