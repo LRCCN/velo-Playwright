@@ -91,8 +91,9 @@ jobs:
           URL=$(yarn --silent vercel deploy --prebuilt \
           --target=preview \
           --token=$VERCEL_TOKEN \
-          --scope=$VERCEL_SCOPE | grep -E '^https://' | tail -1)
+          --scope=$VERCEL_SCOPE | grep -oE 'https://[a-zA-Z0-9._-]+\.vercel\.app' | tail -1)
           echo "deployment-url=$URL" >> $GITHUB_OUTPUT
+          echo "Deployed to: $URL"
 
   e2e-tests:
     name: Run E2E Tests
