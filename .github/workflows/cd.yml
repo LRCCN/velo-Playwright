@@ -15,9 +15,9 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
   VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
-  VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
-  VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-  VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+  VITE_SUPABASE_PROJECT_ID: kwtzwqhnnybnkpqhughu
+  VITE_SUPABASE_URL: https://kwtzwqhnnybnkpqhughu.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_RThrY0JW7uTdBJioguKWhg_HiK9fjj4
 
 jobs:
   unit-tests:
