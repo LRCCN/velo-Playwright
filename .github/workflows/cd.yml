@@ -14,7 +14,7 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
+  VERCEL_SCOPE: luiz-neto
   VITE_SUPABASE_PROJECT_ID: kwtzwqhnnybnkpqhughu
   VITE_SUPABASE_URL: https://kwtzwqhnnybnkpqhughu.supabase.co
   VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_RThrY0JW7uTdBJioguKWhg_HiK9fjj4
