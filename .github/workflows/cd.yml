@@ -130,9 +130,26 @@ jobs:
           #region agent log
           node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>cp.execSync(c,{stdio:['ignore','pipe','ignore']}).toString().trim();const data={disk:sh('df -h .'),cacheDir:sh('bash -lc \"ls -la ~/.cache 2>/dev/null || true\"')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H2,H3,H4',location:'.github/workflows/cd.yml:install-start',message:'starting playwright chromium install',data,timestamp:Date.now()})+'\n');"
           #endregion
-          DEBUG=pw:install yarn playwright install --with-deps chromium
+          set +e
+          DEBUG=pw:install yarn playwright install --with-deps chromium &
+          INSTALL_PID=$!
+          export INSTALL_PID
+          (
+            while kill -0 "$INSTALL_PID" 2>/dev/null; do
+              #region agent log
+              node -e "const fs=require('fs');const cp=require('child_process');const sh=(c)=>{try{return cp.execSync(c,{stdio:['ignore','pipe','ignore'],shell:'/bin/bash'}).toString().trim()}catch(e){return 'ERR:'+e.status}};const pid=process.env.INSTALL_PID;const data={installPid:pid,installProcess:sh('ps -o pid,ppid,stat,etime,cmd -p '+pid),relatedProcesses:sh('pgrep -af \"playwright|node|unzip|zip|chromium\" || true'),tmpDownloads:sh('du -sh /tmp/playwright-download-* 2>/dev/null || true'),browserCache:sh('du -sh ~/.cache/ms-playwright 2>/dev/null || true'),disk:sh('df -h .')};fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H3,H4',location:'.github/workflows/cd.yml:install-heartbeat',message:'playwright install still running',data,timestamp:Date.now()})+'\n');"
+              #endregion
+              cat debug-41ae37.log | tail -n 1
+              sleep 30
+            done
+          ) &
+          MONITOR_PID=$!
+          wait "$INSTALL_PID"
           INSTALL_STATUS=$?
           export INSTALL_STATUS
+          kill "$MONITOR_PID" 2>/dev/null || true
+          wait "$MONITOR_PID" 2>/dev/null || true
+          set -e
           #region agent log
           node -e "const fs=require('fs');const status=process.env.INSTALL_STATUS;fs.appendFileSync('debug-41ae37.log',JSON.stringify({sessionId:'41ae37',runId:'ci-playwright-install',hypothesisId:'H1,H4',location:'.github/workflows/cd.yml:install-end',message:'playwright chromium install finished',data:{status},timestamp:Date.now()})+'\n');"
           #endregion
