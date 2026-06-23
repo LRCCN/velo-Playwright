@@ -14,9 +14,10 @@ env:
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VITE_SUPABASE_PROJECT_ID: kwtzwqhnnybnkpqhughu
-  VITE_SUPABASE_URL: https://kwtzwqhnnybnkpqhughu.supabase.co
-  VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_RThrY0JW7uTdBJioguKWhg_HiK9fjj4
+  VERCEL_SCOPE: ${{ secrets.VERCEL_SCOPE }}
+  VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+  VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+  VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
 jobs:
   unit-tests:
@@ -26,7 +27,7 @@ jobs:
     steps:
       # 1. Faz checkout do código do repositório
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.2FwWSGrT24oitj
 
       # 2. Configura o ambiente Node.js
       - name: Setup Node.js
