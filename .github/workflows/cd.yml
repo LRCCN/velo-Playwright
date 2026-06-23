@@ -116,25 +116,9 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      # 5. Cache do browser do Playwright
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            playwright-${{ runner.os }}-
-
-      # 6. Instalação do Chromium (pulado se cache existir)
+      # 5. Instala o Chromium do Playwright de forma consistente
       - name: Install Playwright Browser
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: yarn playwright install --with-deps chromium
-
-      # 6.1 Instala apenas as dependências do sistema se o cache foi restaurado
-      - name: Install system dependencies only
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: yarn playwright install-deps chromium
 
       # 7. Execução dos Testes de Regressão
       - name: Run E2E Regression Tests
