@@ -1,152 +1,152 @@
-# Velô Sprint - Configurador de Veículo Elétrico
+# Velô Sprint - Electric Vehicle Configurator
 
-Aplicação web em React para configuração e compra do veículo elétrico **Velô Sprint**.
+React web application for configuring and purchasing the **Velô Sprint** electric vehicle.
 
-## Sobre o Projeto
+## About the Project
 
-Uma SPA (Single Page Application) que permite:
-- Personalizar cores, rodas e opcionais do veículo
-- Calcular preços em tempo real
-- Realizar pedidos com análise de crédito
-- Consultar status de pedidos
+A SPA (Single Page Application) that allows you to:
+- Customize the vehicle's colors, wheels, and options
+- Calculate prices in real time
+- Place orders with credit analysis
+- Check order status
 
-**Especificações do Velô Sprint:** 450 km de autonomia | 0-100 km/h em 3.2s | 500 cv
+**Velô Sprint Specs:** 450 km range | 0-100 km/h in 3.2s | 500 hp
 
 ---
 
-## Stack Tecnológica
+## Tech Stack
 
-| Categoria | Tecnologias |
+| Category | Technologies |
 |-----------|-------------|
 | **Frontend** | React 18, TypeScript, Vite, Tailwind CSS, shadcn/ui |
-| **Estado** | Zustand (global), React Hook Form (formulários) |
-| **Validação** | Zod |
+| **State** | Zustand (global), React Hook Form (forms) |
+| **Validation** | Zod |
 | **Data Fetching** | TanStack Query |
 | **Backend** | Supabase (PostgreSQL + Edge Functions) |
 
 ---
 
-## Instalação
+## Installation
 
 ```bash
-# Instalar dependências
+# Install dependencies
 yarn install
 
-# Rodar em desenvolvimento
+# Run in development
 yarn dev
 ```
 
-Acesse: `http://localhost:5173`
+Access: `http://localhost:5173`
 
 ---
 
-## Configuração do Supabase
+## Supabase Setup
 
-### 1. Criar Projeto
+### 1. Create Project
 
-1. Acesse [supabase.com](https://supabase.com) e crie uma conta
-2. Clique em **New Project**
-3. Escolha um nome e senha para o banco
-4. Aguarde a criação (~2 minutos)
+1. Go to [supabase.com](https://supabase.com) and create an account
+2. Click **New Project**
+3. Choose a name and password for the database
+4. Wait for creation (~2 minutes)
 
-### 2. Variáveis de Ambiente
+### 2. Environment Variables
 
-Crie o arquivo `.env` na raiz do projeto:
+Create a `.env` file in the project root:
 
 ```env
-VITE_SUPABASE_PROJECT_ID="seu_project_id"
-VITE_SUPABASE_PUBLISHABLE_KEY="sua_chave_anon_publica"
-VITE_SUPABASE_URL="https://seu_project_id.supabase.co"
+VITE_SUPABASE_PROJECT_ID="your_project_id"
+VITE_SUPABASE_PUBLISHABLE_KEY="your_public_anon_key"
+VITE_SUPABASE_URL="https://your_project_id.supabase.co"
 ```
 
-> Encontre essas informações em: **Project Settings → API**
+> Find this information in: **Project Settings → API**
 
-### 3. Deploy (banco + functions)
+### 3. Deploy (database + functions)
 
 ```bash
-# Instalar CLI
+# Install CLI
 yarn add supabase -D
 
-# Login e vincular projeto
+# Login and link project
 yarn supabase login
 yarn supabase link --project-ref kwtzwqhnnybnkpqhughu
 
-# Aplicar migrações (cria tabelas e RLS)
+# Apply migrations (creates tables and RLS)
 yarn supabase db push
 
-# Deploy das Edge Functions
+# Deploy Edge Functions
 yarn supabase functions deploy
 ```
 
-Pronto! O banco e as functions estarão configurados.
+Done! The database and functions will be configured.
 
 ---
 
-## Estrutura Principal
+## Main Structure
 
 ```
 src/
-├── pages/           # Páginas da aplicação
-├── components/      # Componentes React
-│   ├── configurator/   # Configurador do carro
+├── pages/           # Application pages
+├── components/      # React components
+│   ├── configurator/   # Car configurator
 │   ├── landing/        # Landing page
-│   └── ui/             # Componentes shadcn/ui
-├── store/           # Estado global (Zustand)
-├── hooks/           # Hooks customizados
-└── integrations/    # Cliente Supabase
+│   └── ui/             # shadcn/ui components
+├── store/           # Global state (Zustand)
+├── hooks/           # Custom hooks
+└── integrations/    # Supabase client
 ```
 
 ---
 
-## Rotas
+## Routes
 
-| Rota | Descrição |
+| Route | Description |
 |------|-----------|
 | `/` | Landing page |
-| `/configure` | Configurador do veículo |
-| `/order` | Checkout/Pedido |
-| `/success` | Confirmação do pedido |
-| `/lookup` | Consulta de pedidos |
+| `/configure` | Vehicle configurator |
+| `/order` | Checkout/Order |
+| `/success` | Order confirmation |
+| `/lookup` | Order lookup |
 
 ---
 
-## Modelo de Preços
+## Pricing Model
 
-- **Preço base:** R$ 40.000
-- **Rodas Sport:** +R$ 2.000
-- **Precision Park:** +R$ 5.500
-- **Flux Capacitor:** +R$ 5.000
-- **Financiamento:** 12x com juros de 2% a.m.
+- **Base price:** R$ 40,000
+- **Sport Wheels:** +R$ 2,000
+- **Precision Park:** +R$ 5,500
+- **Flux Capacitor:** +R$ 5,000
+- **Financing:** 12x with 2% monthly interest
 
 ---
 
-## Banco de Dados
+## Database
 
-**Tabela `orders`** — campos principais:
-- `order_number` — Formato: VLO-XXXXXX
-- `color`, `wheel_type`, `optionals` — Configuração
-- `customer_name`, `customer_email`, `customer_cpf` — Cliente
-- `payment_method`, `total_price` — Pagamento
+**`orders` table** — main fields:
+- `order_number` — Format: VLO-XXXXXX
+- `color`, `wheel_type`, `optionals` — Configuration
+- `customer_name`, `customer_email`, `customer_cpf` — Customer
+- `payment_method`, `total_price` — Payment
 - `status` — pending, approved, rejected, analysis
 
 ---
 
-## Análise de Crédito
+## Credit Analysis
 
-| Score | Resultado |
+| Score | Result |
 |-------|-----------|
-| > 700 | Aprovado |
-| 501-700 | Em análise |
-| ≤ 500 | Reprovado |
+| > 700 | Approved |
+| 501-700 | Under review |
+| ≤ 500 | Rejected |
 
-*Se entrada ≥ 50% do total, aprova mesmo com score < 700*
+*If down payment ≥ 50% of total, approves even with score < 700*
 
 ---
 
-## Fluxo Principal
+## Main Flow
 
 ```
-Landing → Configurador → Checkout → Análise de Crédito → Confirmação
+Landing → Configurator → Checkout → Credit Analysis → Confirmation
 ```
 
 ---
@@ -154,7 +154,7 @@ Landing → Configurador → Checkout → Análise de Crédito → Confirmação
 ## Scripts
 
 ```bash
-npm run dev      # Desenvolvimento
-npm run build    # Build de produção
-npm run lint     # Verificar código
+npm run dev      # Development
+npm run build    # Production build
+npm run lint     # Lint code
 ```
